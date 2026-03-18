@@ -1,0 +1,54 @@
+name: Agent Issue Router
+
+on:
+  issues:
+    types: [opened, labeled, edited]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to route manually
+        required: true
+        type: string
+
+jobs:
+  route:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether issue is ready for agent
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const isManual = context.eventName === 'workflow_dispatch';
+            const issueNumber = isManual
+              ? Number(core.getInput('issue_number'))
+              : context.payload.issue?.number;
+
+            if (!issueNumber) {
+              core.setFailed('No issue number found.');
+              return;
+            }
+
+            const { data: issue } = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+            });
+
+            const labels = (issue.labels || []).map(label => typeof label === 'string' ? label : label.name);
+            const ready = labels.includes('agent-ready');
+
+            core.info(`Issue #${issueNumber}`);
+            core.info(`Ready for agent: ${ready}`);
+            core.info(`Labels: ${labels.join(', ')}`);
+
+            if (!ready) {
+              core.info('Skipping because issue is not labeled agent-ready.');
+              return;
+            }
+
+            core.notice('Issue is agent-ready. Connect this workflow to your Builder Agent here.');
+
+      - name: Next integration placeholder
+        run: |
+          echo "Connect Codex / Claude Code / internal agent in this job or trigger a reusable workflow."
+          echo "Recommended next step: pass issue number, title, body, and labels into your builder workflow."
