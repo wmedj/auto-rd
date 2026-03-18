@@ -1,0 +1,86 @@
+name: Agent Task
+about: 用于交给 AI Agent 执行的标准任务模板
+labels:
+  - needs-spec
+body:
+  - type: dropdown
+    id: task_type
+    attributes:
+      label: 任务类型
+      options:
+        - feature
+        - bug
+        - ops
+        - docs
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: 背景
+      description: 当前问题、上下文、为什么要做这件事。
+      placeholder: 描述现状、影响范围和触发背景。
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: 目标
+      description: 只写本次任务要达成的结果。
+      placeholder: 例如：新增一个脚本，自动校验 PR 标题是否符合规范。
+    validations:
+      required: true
+
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: 非目标
+      description: 明确本次不做什么，避免 Agent 过度扩展。
+      placeholder: 例如：不修改业务逻辑、不重构历史代码。
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 验收标准
+      description: 尽量写成可判断的条目。
+      placeholder: |
+        - [ ] 满足条件 A 时，输出 B
+        - [ ] 不影响现有流程 C
+        - [ ] 补充必要测试或检查
+    validations:
+      required: true
+
+  - type: textarea
+    id: test_plan
+    attributes:
+      label: 测试方法
+      description: 说明人工或自动化如何验证。
+      placeholder: |
+        1. 执行命令 ...
+        2. 打开页面 ...
+        3. 观察结果 ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: 约束与风险
+      description: 标明不能动的范围、高风险文件、依赖限制等。
+      placeholder: 例如：不要修改 auth 相关代码；不要新增第三方依赖。
+
+  - type: checkboxes
+    id: ready_check
+    attributes:
+      label: Ready 检查
+      options:
+        - label: 我已经写清楚背景和目标
+          required: true
+        - label: 我已经写清楚验收标准
+          required: true
+        - label: 我已经写清楚测试方法
+          required: true
+        - label: 我确认该任务可以交给 Agent 尝试
+          required: true
